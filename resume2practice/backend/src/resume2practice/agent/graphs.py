@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 
 class Resume2Practice:
   def __init__(self, 
-               resume_profiler: ResumeProfiler,
-               job_description_profiler: JobDescriptionProfiler,
-               scorecard_generator: ScorecardGenerator,
-               task_generator: TaskGenerator,
+               resume_profiler_chain: ResumeProfiler,
+               job_description_profiler_chain: JobDescriptionProfiler,
+               scorecard_generator_chain: ScorecardGenerator,
+               task_generator_chain: TaskGenerator,
                config: Optional[Dict[str, Any]] = None, 
                checkpointer: Optional[Any] = None):
     if config is None:
@@ -30,20 +30,20 @@ class Resume2Practice:
           }
       }
     self.config = config
-    self.resume_profiler = resume_profiler,
-    self.job_description_profiler = job_description_profiler
-    self.scorecard_generator = scorecard_generator
-    self.task_generator = task_generator
+    self.resume_profiler_agent = resume_profiler_chain
+    self.job_description_profiler = job_description_profiler_chain
+    self.scorecard_generator = scorecard_generator_chain
+    self.task_generator = task_generator_chain
     self.checkpointer = checkpointer if checkpointer else MemorySaver()
     self.graph = None
     self.build_graph()
 
   async def resume_profiler_node(self, state: TaskGeneratorState, config: Optional[Dict[str, Any]] = None):
     logger.info("Resume Profiler: Generating profile from resume...")
-    resume_profile = await self.resume_profiler.ainvoke(state["resume"])
+    resume_profile = await self.resume_profiler_agent.ainvoke(state["resume"])
     logger.info("Resume Profiler: Resume profile complete!")
     return Command(
-        update={"resume_profile": resume_profile}, goto="job_description_profiler"
+        update={"resume_profile": resume_profile.model_dump_json()}, goto="job_description_profiler"
     )
 
   async def job_description_profiler_node(self, state: TaskGeneratorState, config: Optional[Dict[str, Any]] = None):
@@ -51,36 +51,36 @@ class Resume2Practice:
     job_description_profile = await self.job_description_profiler.ainvoke(state["job_description"])
     logger.info("Job Description Profiler: Job description profile complete!")
     return Command(
-        update={"job_description_profile": job_description_profile}, goto="scorecard_generator"
+        update={"job_description_profile": job_description_profile.model_dump_json()}, goto="scorecard_generator"
     )
 
   async def scorecard_generator_node(self, state: TaskGeneratorState, config: Optional[Dict[str, Any]] = None):
     logger.info("Scorecard Generator: Generating scorecard...")
     context = {
-        "resume_profile": state["resume_profile"].model_dump_json(),
-        "job_description_profile": state["job_description_profile"].model_dump_json()
+        "resume_profile": state["resume_profile"],
+        "job_description_profile": state["job_description_profile"]
     }
     # Generate list of initial questions to help fill in the blanks
     precheck_list = await self.scorecard_generator.intake.ainvoke(context)
     added_context = interrupt(precheck_list.model_dump_json())
     logger.info(f"Added context: {added_context}")
     context.update({"additional_context": added_context})
-    scorecard = await self.scorecard_generator.invoke(context)
+    scorecard = await self.scorecard_generator.ainvoke(context)
     logger.info("Scorecard Generator: Scorecard generated!")
     return Command(
-        update={"scorecard": scorecard}, goto="task_generator"
+        update={"scorecard": scorecard.model_dump_json()}, goto="task_generator"
     )
 
   async def task_generator_node(self, state: TaskGeneratorState, config: Optional[Dict[str, Any]] = None):
     logger.info("Task Generator: Creating tasks...")
     context = {
-        "job_description_profile": state["job_description_profile"].model_dump_json(),
-        "scorecard": state["scorecard"].model_dump_json()
+        "job_description_profile": state["job_description_profile"],
+        "scorecard": state["scorecard"]
     }
     task_list = await self.task_generator.ainvoke(context)
     logger.info("Task Generator: Tasks created!")
     return Command(
-        update={"task_list": task_list}, goto=END
+        update={"task_list": task_list.model_dump_json()}, goto=END
     )
 
 

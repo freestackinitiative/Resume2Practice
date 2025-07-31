@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Resume2Practice{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <!-- Header -->
+    <div class="text-center mb-8 fade-in">
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">
+            <i class="fas fa-chart-line text-green-600 mr-3"></i>
+            Your Career Analysis Results
+        </h1>
+        <p class="text-lg text-gray-600">
+            Based on your resume and the job description, here's your personalized career roadmap.
+        </p>
+    </div>
+
+    <!-- Scorecard Section -->
+    <div class="max-w-6xl mx-auto mb-12">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="gradient-bg px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-clipboard-check mr-3"></i>
+                    Career Readiness Scorecard
+                </h2>
+            </div>
+            
+            <div class="p-6">
+                <!-- Readiness Score -->
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white mb-4">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold">{{ "%.1f"|format(scorecard.readiness_score * 10) }}</div>
+                            <div class="text-sm">out of 10</div>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900">Overall Readiness Score</h3>
+                </div>
+
+                <!-- Gap Analysis -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-search text-blue-600 mr-3"></i>
+                        Gap Analysis
+                    </h3>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <p class="text-gray-700 leading-relaxed">{{ scorecard.gap_analysis }}</p>
+                    </div>
+                </div>
+
+                <!-- Strengths and Weaknesses Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Strengths -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-star text-green-600 mr-3"></i>
+                            Your Strengths
+                        </h3>
+                        <div class="space-y-3">
+                            {% for strength in scorecard.strengths %}
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4 card-hover">
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-green-600 mt-1 mr-3"></i>
+                                    <p class="text-gray-700">{{ strength }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Weaknesses -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                            Areas for Improvement
+                        </h3>
+                        <div class="space-y-3">
+                            {% for weakness in scorecard.weaknesses %}
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 card-hover">
+                                <div class="flex items-start">
+                                    <i class="fas fa-arrow-up text-yellow-600 mt-1 mr-3"></i>
+                                    <p class="text-gray-700">{{ weakness }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opportunity for Growth -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-rocket text-purple-600 mr-3"></i>
+                        Opportunity for Growth
+                    </h3>
+                    <div class="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                        <p class="text-gray-700 leading-relaxed">{{ scorecard.opportunity_for_growth }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Tasks Section -->
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="gradient-bg px-6 py-4">
+                <h2 class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-tasks mr-3"></i>
+                    Practice Tasks & Scenarios
+                </h2>
+                <p class="text-blue-100 mt-2">
+                    Complete these realistic job scenarios to improve your skills and readiness.
+                </p>
+            </div>
+            
+            <div class="p-6">
+                {% if task_list.tasks %}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {% for task in task_list.tasks %}
+                    <div class="border border-gray-200 rounded-lg p-6 card-hover bg-gradient-to-br from-white to-gray-50">
+                        <!-- Task Header -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <i class="fas fa-tag mr-1"></i>
+                                        {{ task.task_type }}
+                                    </span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                                    {{ task.task_summary }}
+                                </h3>
+                            </div>
+                            <i class="fas fa-clipboard-list text-2xl text-gray-400"></i>
+                        </div>
+
+                        <!-- Task Description -->
+                        <div class="mb-4">
+                            <h4 class="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                                Description
+                            </h4>
+                            <p class="text-gray-700 text-sm leading-relaxed">{{ task.task_description }}</p>
+                        </div>
+
+                        <!-- Evaluation Criteria -->
+                        <div class="mb-4">
+                            <h4 class="text-sm font-medium text-gray-900 mb-2 flex items-center">
+                                <i class="fas fa-check-square text-green-500 mr-2"></i>
+                                Evaluation Criteria
+                            </h4>
+                            <p class="text-gray-700 text-sm leading-relaxed">{{ task.evaluation_criteria }}</p>
+                        </div>
+
+                        <!-- Task Data (if available) -->
+                        {% if task.task_data %}
+                        <div class="mb-4">
+                            <button type="button" 
+                                    class="task-data-toggle w-full text-left bg-gray-100 hover:bg-gray-200 rounded-lg p-3 transition duration-300"
+                                    onclick="toggleTaskData('task-{{ loop.index }}')">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-900 flex items-center">
+                                        <i class="fas fa-database text-purple-500 mr-2"></i>
+                                        View Task Data
+                                    </span>
+                                    <i class="fas fa-chevron-down transform transition-transform duration-300" id="task-{{ loop.index }}-icon"></i>
+                                </div>
+                            </button>
+                            <div id="task-{{ loop.index }}-data" class="hidden mt-3 bg-gray-50 rounded-lg p-4 border">
+                                <pre class="text-xs text-gray-700 whitespace-pre-wrap overflow-x-auto">{{ task.task_data }}</pre>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Action Button -->
+                        <div class="mt-6">
+                            <button class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 transform hover:scale-105">
+                                <i class="fas fa-play mr-2"></i>
+                                Start Practice
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-exclamation-circle text-4xl text-gray-400 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Tasks Available</h3>
+                    <p class="text-gray-600">We couldn't generate practice tasks at this time. Please try again later.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="max-w-6xl mx-auto mt-8 text-center">
+        <div class="space-x-4">
+            <a href="/" 
+               class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 font-medium transition duration-300">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Start New Analysis
+            </a>
+            <button onclick="window.print()" 
+                    class="inline-flex items-center px-6 py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-medium transition duration-300">
+                <i class="fas fa-print mr-2"></i>
+                Print Results
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@media print {
+    .no-print { display: none !important; }
+    body { background: white !important; }
+    .shadow-lg { box-shadow: none !important; }
+    .gradient-bg { background: #4f46e5 !important; }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleTaskData(taskId) {
+    const dataDiv = document.getElementById(taskId + '-data');
+    const icon = document.getElementById(taskId + '-icon');
+    
+    if (dataDiv.classList.contains('hidden')) {
+        dataDiv.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+    } else {
+        dataDiv.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+    }
+}
+
+// Add smooth scrolling to page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation to cards
+    const cards = document.querySelectorAll('.card-hover');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: ${FRONTEND_BUILD_TARGET}
+    ports:
+      - "8888:8888"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=true
+      - BACKEND_URL=http://backend:5000
+      - SECRET_KEY=dev-secret-key-change-in-production
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - resume2practice
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ${BACKEND_BUILD_TARGET}
+    ports:
+      - "5000:5000"
+    environment:
+      - LLM_VENDOR_ID=openai
+      - LLM_MODEL_ID=gpt-4.1-mini
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FRONTEND_CLIENT_URL=http://frontend:8888
+    volumes:
+      - ./backend/src:/src
+    networks:
+      - resume2practice
+
+networks:
+  resume2practice:
+    driver: bridge

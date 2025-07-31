@@ -40,8 +40,8 @@ class ResumeProfiler(BaseAgent):
         if not self._llm:
             raise ValueError("Language model not initialized. Check model_factory")
         
-        if self._response_format is not None and isinstance(self._response_format, BaseModel):
-            self._llm = self._llm.with_structured_output(self._response_format)
+        if self._response_format is not None:
+            self._llm = self._llm.with_structured_output(self._response_format, method="json_mode")
         resume_profiler_prompt = ChatPromptTemplate.from_messages([
             SystemMessage(content=self._role),
             ("human", "{resume}")
@@ -87,8 +87,8 @@ class JobDescriptionProfiler(BaseAgent):
         if not self._llm:
             raise ValueError("Language model not initialized. Check model_factory")
         
-        if self._response_format is not None and isinstance(self._response_format, BaseModel):
-            self._llm = self._llm.with_structured_output(self._response_format)
+        if self._response_format is not None:
+            self._llm = self._llm.with_structured_output(self._response_format, method="json_mode")
         jd_profiler_prompt = ChatPromptTemplate.from_messages([
             SystemMessage(content=self._role),
             ("human", "{job_description}")
@@ -145,8 +145,8 @@ class ScorecardGenerator(BaseAgent):
         if not self._llm:
             raise ValueError("Language model not initialized. Check model_factory")
         
-        if self._response_format is not None and isinstance(self._response_format, BaseModel):
-            self._llm = self._llm.with_structured_output(self._response_format)
+        if self._response_format is not None:
+            self._llm = self._llm.with_structured_output(self._response_format, method="json_mode")
         scorecard_generator_prompt = ChatPromptTemplate.from_messages([
             SystemMessage(content=self._role),
             ("human", "{resume_profile} {job_description_profile}")
@@ -193,8 +193,8 @@ class TaskGenerator(BaseAgent):
         if not self._llm:
             raise ValueError("Language model not initialized. Check model_factory")
         
-        if self._response_format is not None and isinstance(self._response_format, BaseModel):
-            self._llm = self._llm.with_structured_output(self._response_format)
+        if self._response_format is not None:
+            self._llm = self._llm.with_structured_output(self._response_format, method="json_mode")
         task_generator_prompt = ChatPromptTemplate.from_messages([
             SystemMessage(content=self._role),
             ("human", "{job_description_profile} {scorecard}")
@@ -220,10 +220,4 @@ class TaskGenerator(BaseAgent):
             raise AgentExecutionError(
                 f"An exception occurred while trying to invoke the following context: {context}\n{(str(ex))}"
             )
-    
-
-
-        
-
-
     

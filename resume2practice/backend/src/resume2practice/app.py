@@ -13,6 +13,7 @@ from langgraph.types import Command
 from io import BytesIO
 from pypdf import PdfReader
 from typing import Optional, Dict, Any
+import json
 import os
 
 # -- Configuration ------------------------------------------------------------------------------------
@@ -31,10 +32,10 @@ async def lifespan(app: FastAPI):
     task_generator_model = os.environ.get("TASK_GENERATOR_MODEL", os.environ.get("LLM_MODEL_ID", "gpt-4.1-mini"))
     task_generator_vendor = os.environ.get("TASK_GENERATOR_VENDOR", os.environ.get("LLM_VENDOR_ID", "openai"))
     task_generator = TaskGenerator(vendor=task_generator_vendor, model_id=task_generator_model)
-    workflow = Resume2Practice(resume_profiler=resume_profiler, 
-                               job_description_profiler=job_description_profiler, 
-                               scorecard_generator=scorecard_generator, 
-                               task_generator=task_generator)
+    workflow = Resume2Practice(resume_profiler_chain=resume_profiler, 
+                               job_description_profiler_chain=job_description_profiler, 
+                               scorecard_generator_chain=scorecard_generator, 
+                               task_generator_chain=task_generator)
     app.state.agent = workflow
     yield
 
@@ -113,7 +114,7 @@ async def analyze(
     response = await app.state.agent.ainvoke(context=context, config=config)
 
     # Return the state of the interrupt
-    return JSONResponse(content=response["__interrupt__"][0].value)
+    return JSONResponse(content=json.loads(response["__interrupt__"][0].value))
 
 @app.post("/resume")
 async def resume(data: Dict[str, Any]):
@@ -131,7 +132,13 @@ async def resume(data: Dict[str, Any]):
             context=Command(resume=data.get("response", "")), 
             config=config
         )
-        return JSONResponse(content=result)
+
+        final_result = {
+            "scorecard": result["scorecard"],
+            "task_list": result["task_list"]
+        }
+
+        return JSONResponse(content=final_result)
     except Exception as ex:
         raise HTTPException(
             status_code=500, 

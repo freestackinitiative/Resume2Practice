@@ -50,7 +50,7 @@ SCORECARD_GENERATOR = """
     strengths: list[str] = Field(None, description="Strengths of the applicant")
     weaknesses: list[str] = Field(None, description="Weaknesses of the applicant")
     opportunity_for_growth: str = Field(None, description="Opportunity for growth of the applicant")
-    readiness_score: float = Field(None, description="Overall score of the applicant")
+    readiness_score: float = Field(None, description="Overall score of the applicant - must be between 0.0 and 10.0")
 </instructions>
 """
 

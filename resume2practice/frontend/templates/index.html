@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+
+{% block title %}Resume2Practice - AI Career Analysis{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <!-- Hero Section -->
+    <div class="text-center mb-12 fade-in">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+            Transform Your Career with AI-Powered Analysis
+        </h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Upload your resume and a job description to get personalized insights, gap analysis, and practice tasks to help you land your dream job.
+        </p>
+    </div>
+
+    <!-- Main Form -->
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-8">
+            <form id="analysisForm" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Resume Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                                <i class="fas fa-file-user text-blue-600 mr-3"></i>
+                                Your Resume
+                            </h2>
+                            <p class="text-gray-600 mt-2">Provide your resume as text or upload a PDF file</p>
+                        </div>
+
+                        <!-- Resume Input Tabs -->
+                        <div class="border-b border-gray-200">
+                            <nav class="-mb-px flex space-x-8">
+                                <button type="button" id="resumeTextTab" class="resume-tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition duration-300">
+                                    <i class="fas fa-keyboard mr-2"></i>Paste Text
+                                </button>
+                                <button type="button" id="resumeFileTab" class="resume-tab border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                                    <i class="fas fa-upload mr-2"></i>Upload PDF
+                                </button>
+                            </nav>
+                        </div>
+
+                        <!-- Resume Text Input -->
+                        <div id="resumeTextSection" class="hidden">
+                            <textarea id="resumeText" name="resume_text" rows="12" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                    placeholder="Paste your resume text here..."></textarea>
+                        </div>
+
+                        <!-- Resume File Upload -->
+                        <div id="resumeFileSection">
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition duration-300">
+                                <input type="file" id="resumeFile" name="resume_file" accept=".pdf" class="hidden">
+                                <label for="resumeFile" class="cursor-pointer">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
+                                    <p class="text-lg font-medium text-gray-900 mb-2">Upload Resume PDF</p>
+                                    <p class="text-gray-500">Click to browse or drag and drop</p>
+                                </label>
+                                <div id="resumeFileName" class="mt-4 text-sm text-green-600 hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description Section -->
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                                <i class="fas fa-briefcase text-green-600 mr-3"></i>
+                                Job Description
+                            </h2>
+                            <p class="text-gray-600 mt-2">Provide the job description as text or upload a PDF file</p>
+                        </div>
+
+                        <!-- Job Description Input Tabs -->
+                        <div class="border-b border-gray-200">
+                            <nav class="-mb-px flex space-x-8">
+                                <button type="button" id="jobTextTab" class="job-tab border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                                    <i class="fas fa-keyboard mr-2"></i>Paste Text
+                                </button>
+                                <button type="button" id="jobFileTab" class="job-tab border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition duration-300">
+                                    <i class="fas fa-upload mr-2"></i>Upload PDF
+                                </button>
+                            </nav>
+                        </div>
+
+                        <!-- Job Description Text Input -->
+                        <div id="jobTextSection">
+                            <textarea id="jobText" name="job_description_text" rows="12" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                    placeholder="Paste the job description here..."></textarea>
+                        </div>
+
+                        <!-- Job Description File Upload -->
+                        <div id="jobFileSection" class="hidden">
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-400 transition duration-300">
+                                <input type="file" id="jobFile" name="job_description_file" accept=".pdf" class="hidden">
+                                <label for="jobFile" class="cursor-pointer">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4 block"></i>
+                                    <p class="text-lg font-medium text-gray-900 mb-2">Upload Job Description PDF</p>
+                                    <p class="text-gray-500">Click to browse or drag and drop</p>
+                                </label>
+                                <div id="jobFileName" class="mt-4 text-sm text-green-600 hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-8 text-center">
+                    <button type="submit" id="analyzeBtn" 
+                            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Analyze Resume & Job Match
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Questions Section (Initially Hidden) -->
+    <div id="questionsSection" class="max-w-4xl mx-auto mt-8 bg-white shadow-lg rounded-lg overflow-hidden hidden">
+        <div class="px-6 py-8">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                    <i class="fas fa-question-circle text-blue-600 mr-3"></i>
+                    Additional Information
+                </h2>
+                <p class="text-gray-600">
+                    Please answer these questions to help us provide better analysis. You can skip any questions you prefer not to answer.
+                </p>
+            </div>
+            
+            <form id="questionsForm">
+                <div id="questionsList" class="space-y-6">
+                    <!-- Questions will be dynamically inserted here -->
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <button type="submit" 
+                            class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Submit Answers & Get Results
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching functionality
+    const resumeTabs = document.querySelectorAll('.resume-tab');
+    const jobTabs = document.querySelectorAll('.job-tab');
+    
+    // Resume tabs
+    resumeTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            resumeTabs.forEach(t => {
+                t.classList.remove('border-blue-500', 'text-blue-600');
+                t.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            this.classList.remove('border-transparent', 'text-gray-500');
+            this.classList.add('border-blue-500', 'text-blue-600');
+            
+            if (this.id === 'resumeTextTab') {
+                document.getElementById('resumeTextSection').classList.remove('hidden');
+                document.getElementById('resumeFileSection').classList.add('hidden');
+                document.getElementById('resumeFile').value = '';
+                document.getElementById('resumeFileName').classList.add('hidden');
+            } else {
+                document.getElementById('resumeTextSection').classList.add('hidden');
+                document.getElementById('resumeFileSection').classList.remove('hidden');
+                document.getElementById('resumeText').value = '';
+            }
+        });
+    });
+    
+    // Job description tabs
+    jobTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            jobTabs.forEach(t => {
+                t.classList.remove('border-blue-500', 'text-blue-600');
+                t.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            this.classList.remove('border-transparent', 'text-gray-500');
+            this.classList.add('border-blue-500', 'text-blue-600');
+            
+            if (this.id === 'jobTextTab') {
+                document.getElementById('jobTextSection').classList.remove('hidden');
+                document.getElementById('jobFileSection').classList.add('hidden');
+                document.getElementById('jobFile').value = '';
+                document.getElementById('jobFileName').classList.add('hidden');
+            } else {
+                document.getElementById('jobTextSection').classList.add('hidden');
+                document.getElementById('jobFileSection').classList.remove('hidden');
+                document.getElementById('jobText').value = '';
+            }
+        });
+    });
+    
+    // File upload handlers
+    document.getElementById('resumeFile').addEventListener('change', function() {
+        const fileName = this.files[0]?.name;
+        const fileNameDiv = document.getElementById('resumeFileName');
+        if (fileName) {
+            fileNameDiv.textContent = `Selected: ${fileName}`;
+            fileNameDiv.classList.remove('hidden');
+        } else {
+            fileNameDiv.classList.add('hidden');
+        }
+    });
+    
+    document.getElementById('jobFile').addEventListener('change', function() {
+        const fileName = this.files[0]?.name;
+        const fileNameDiv = document.getElementById('jobFileName');
+        if (fileName) {
+            fileNameDiv.textContent = `Selected: ${fileName}`;
+            fileNameDiv.classList.remove('hidden');
+        } else {
+            fileNameDiv.classList.add('hidden');
+        }
+    });
+    
+    // Main form submission
+    document.getElementById('analysisForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        showLoading();
+        
+        const formData = new FormData(this);
+        
+        fetch('/analyze', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                showQuestions(data.questions);
+                showSuccess('Analysis complete! Please answer the additional questions below.');
+            } else {
+                showError(data.error || 'An error occurred during analysis.');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showError('Failed to analyze. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+    
+    // Questions form submission
+    document.getElementById('questionsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        showLoading();
+        
+        const answers = [];
+        const questionInputs = document.querySelectorAll('.question-input');
+        
+        questionInputs.forEach(input => {
+            answers.push(input.value || '');
+        });
+        
+        fetch('/submit_answers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ answers: answers })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                showError(data.error || 'An error occurred while processing your answers.');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showError('Failed to process answers. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+    
+    function showQuestions(questions) {
+        const questionsSection = document.getElementById('questionsSection');
+        const questionsList = document.getElementById('questionsList');
+        
+        questionsList.innerHTML = '';
+        
+        questions.forEach((question, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'bg-gray-50 p-6 rounded-lg border border-gray-200';
+            questionDiv.innerHTML = `
+                <label class="block text-sm font-medium text-gray-900 mb-3">
+                    <i class="fas fa-question text-blue-500 mr-2"></i>
+                    Question ${index + 1}
+                </label>
+                <p class="text-gray-700 mb-4">${question}</p>
+                <textarea class="question-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
+                         rows="3" 
+                         placeholder="Your answer (optional)..."></textarea>
+            `;
+            questionsList.appendChild(questionDiv);
+        });
+        
+        questionsSection.classList.remove('hidden');
+        questionsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Form validation
+    function validateForm() {
+        const resumeText = document.getElementById('resumeText').value.trim();
+        const resumeFile = document.getElementById('resumeFile').files[0];
+        const jobText = document.getElementById('jobText').value.trim();
+        const jobFile = document.getElementById('jobFile').files[0];
+        
+        // Check if resume is provided
+        if (!resumeText && !resumeFile) {
+            showError('Please provide your resume either as text or by uploading a PDF file.');
+            return false;
+        }
+        
+        // Check if job description is provided
+        if (!jobText && !jobFile) {
+            showError('Please provide a job description either as text or by uploading a PDF file.');
+            return false;
+        }
+        
+        // Validate file types if files are selected
+        if (resumeFile && !resumeFile.name.toLowerCase().endsWith('.pdf')) {
+            showError('Resume file must be a PDF.');
+            return false;
+        }
+        
+        if (jobFile && !jobFile.name.toLowerCase().endsWith('.pdf')) {
+            showError('Job description file must be a PDF.');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Update form submission to include validation
+    document.getElementById('analysisForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
+        showLoading();
+        
+        const formData = new FormData(this);
+        
+        fetch('/analyze', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            
+            if (data.success) {
+                showQuestions(data.questions);
+                showSuccess('Analysis complete! Please answer the additional questions below.');
+                
+                // Scroll to questions section and hide the main form
+                document.getElementById('analysisForm').style.opacity = '0.7';
+                document.getElementById('analysisForm').style.pointerEvents = 'none';
+            } else {
+                showError(data.error || 'An error occurred during analysis.');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            showError('Failed to analyze. Please try again.');
+            console.error('Error:', error);
+        });
+    });
+    
+    // Add drag and drop functionality
+    function setupDragAndDrop(fileInputId, dropZoneId) {
+        const fileInput = document.getElementById(fileInputId);
+        const dropZone = document.getElementById(dropZoneId).parentElement;
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight(e) {
+            dropZone.classList.add('border-blue-500', 'bg-blue-50');
+        }
+        
+        function unhighlight(e) {
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+        }
+        
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+    }
+    
+    // Initialize drag and drop
+    setupDragAndDrop('resumeFile', 'resumeFile');
+    setupDragAndDrop('jobFile', 'jobFile');
+});
+</script>
+{% endblock %}
